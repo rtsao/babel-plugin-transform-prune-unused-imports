@@ -84,6 +84,26 @@ import { unreachable } from "some-pkg";
 foo && false && bar && unreachable;
 ```
 
+### Variable shadowing
+
+Variable scope is correctly handled.
+
+```js
+// Before
+import { unused } from "some-pkg";
+
+function foo(unused) {
+  unused;
+}
+```
+
+```js
+// After
+function foo(unused) {
+  unused;
+}
+```
+
 ## Caveats
 
 While this plugin works for most use cases, the static analysis is performed by this plugin is ultimately limited and won't work in some scenarios.

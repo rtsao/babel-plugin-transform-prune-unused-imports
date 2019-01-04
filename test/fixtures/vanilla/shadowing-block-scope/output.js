@@ -1,0 +1,4 @@
+{
+  let unused = other;
+  unused;
+}
