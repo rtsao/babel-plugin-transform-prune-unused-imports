@@ -108,7 +108,7 @@ module.exports = (
   }
 
   return {
-    name: "transform",
+    name: "babel-plugin-transform-prune-unused-imports",
     visitor: {
       ImportDeclaration(path /* :any */) {
         if (path.removed) {
