@@ -1,6 +1,6 @@
 // @flow
 
-const pluginTester = require("babel-plugin-tester");
+const pluginTester = require("babel-plugin-tester").default;
 const plugin = require("../index.js");
 
 pluginTester({
