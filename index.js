@@ -67,6 +67,32 @@ module.exports = (
     );
   }
 
+  function isCertainlyFalsyExpression(path) {
+    // traverse chained LogicalExpressions
+    // to handle cases like: `false && unknown && to_be_shaken`
+    let _path = path;
+    while (_path) {
+      if (
+        _path.type === "LogicalExpression" &&
+        _path.get("operator").node === "&&"
+      ) {
+        if (isCertainlyFalsyExpression(_path.get("right"))) {
+          return true;
+        }
+        _path = _path.get("left");
+        if (isCertainlyFalsyExpression(_path)) {
+          return true;
+        }
+      } else {
+        break;
+      }
+    }
+
+    if (isFalsyPath(_path)) {
+      return true;
+    }
+  }
+
   function isPathCertainlyUnreachable(path) {
     while (path) {
       if (
@@ -74,33 +100,20 @@ module.exports = (
         (path.parentPath.type === "IfStatement" ||
           path.parentPath.type === "ConditionalExpression")
       ) {
-        const consquent = path.parentPath.get("consequent");
+        const consequent = path.parentPath.get("consequent");
         const alternate = path.parentPath.get("alternate");
-        if (isFalsyPath(path.parentPath.get("test")) && consquent === path) {
+        const test = path.parentPath.get("test");
+
+        if (consequent === path && isCertainlyFalsyExpression(test)) {
           return true;
         }
-        if (isTruthyPath(path.parentPath.get("test")) && alternate === path) {
+        if (alternate === path && isTruthyPath(test)) {
           return true;
         }
       }
-      // traverse chained LogicalExpressions
-      // to handle cases like: `false && unknown && to_be_shaken`
-      let _path = path;
-      while (_path) {
-        if (
-          _path.type === "LogicalExpression" &&
-          _path.get("operator").node === "&&"
-        ) {
-          if (isFalsyPath(_path.get("right"))) {
-            return true;
-          }
-          _path = _path.get("left");
-          if (isFalsyPath(_path)) {
-            return true;
-          }
-        } else {
-          break;
-        }
+
+      if (isCertainlyFalsyExpression(path)) {
+        return true;
       }
 
       path = path.parentPath;
