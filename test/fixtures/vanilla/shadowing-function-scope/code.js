@@ -1,5 +1,8 @@
-import { unused } from "some-pkg";
+import { unreachable } from "some-pkg";
 
-function foo(unused) {
-  unused;
+function foo(unreachable) {
+  unreachable;
+}
+if (false) {
+  unreachable;
 }
