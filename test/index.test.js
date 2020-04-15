@@ -10,6 +10,22 @@ pluginTester({
 
 pluginTester({
   plugin: plugin,
+  fixtures: __dirname + "/fixtures/jsx",
+  babelOptions: {
+    plugins: ["@babel/plugin-syntax-jsx"]
+  }
+});
+
+pluginTester({
+  plugin: plugin,
+  fixtures: __dirname + "/fixtures/ignored-modules",
+  pluginOptions: {
+    ignoredModules: ["some-ignored-package"]
+  }
+});
+
+pluginTester({
+  plugin: plugin,
   fixtures: __dirname + "/fixtures/browser-env",
   pluginOptions: {
     falsyExpressions: ["__NODE__"],

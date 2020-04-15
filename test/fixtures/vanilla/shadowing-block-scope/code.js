@@ -1,6 +1,9 @@
-import { unused } from "some-pkg";
+import { unreachable } from "some-pkg";
 
 {
-  let unused = other;
-  unused;
+  let unreachable = other;
+  unreachable;
+}
+if (false) {
+  unreachable;
 }

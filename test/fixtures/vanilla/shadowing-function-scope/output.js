@@ -1,3 +1,7 @@
-function foo(unused) {
-  unused;
+function foo(unreachable) {
+  unreachable;
+}
+
+if (false) {
+  unreachable;
 }

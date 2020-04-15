@@ -4,6 +4,7 @@
 type PluginOpts = {
   falsyExpressions: Array<string>,
   truthyExpressions: Array<string>,
+  ignoredModules: Array<string>,
 };
 */
 
@@ -11,7 +12,8 @@ module.exports = (
   api /*: any */,
   {
     falsyExpressions: falsyOpt = [],
-    truthyExpressions: truthyOpt = []
+    truthyExpressions: truthyOpt = [],
+    ignoredModules: modulesArr = []
   } /*: PluginOpts */ = {}
 ) => {
   const { types: t } = api;
@@ -22,6 +24,8 @@ module.exports = (
   if (!Array.isArray(truthyOpt)) {
     throw new Error("truthyExpressions must be an array");
   }
+
+  const ignoredModules = new Set(modulesArr);
 
   function stringToExpression(expr) {
     if (typeof expr !== "string") {
@@ -132,25 +136,32 @@ module.exports = (
         // Imports with no specifiers is probably specifically for side effects
         let shakeDeclaration = specifiers.length > 0;
 
+        const moduleName = path.node.source.value;
+        if (ignoredModules.has(moduleName)) {
+          return;
+        }
+
         for (const specifier of specifiers) {
           let shakeSpecifier = true;
 
           const localPath = specifier.get("local");
           const localName = localPath.node.name;
-          // This should not be hardcoded to React and/or improve compat with JSX transform
-          if (localName === "React") {
-            shakeSpecifier = false;
-            shakeDeclaration = false;
-            break;
-          }
           const binding = localPath.scope.bindings[localName];
           if (binding) {
             const refPaths = binding.referencePaths;
-            for (const path of refPaths) {
-              const unreachable = isPathCertainlyUnreachable(path);
-              if (!unreachable) {
-                shakeSpecifier = false;
-                shakeDeclaration = false;
+
+            if (refPaths.length === 0) {
+              // If no references exist, then this specifier is almost certainly
+              // being imported for side effects.
+              shakeSpecifier = false;
+              shakeDeclaration = false;
+            } else {
+              for (const path of refPaths) {
+                const unreachable = isPathCertainlyUnreachable(path);
+                if (!unreachable) {
+                  shakeSpecifier = false;
+                  shakeDeclaration = false;
+                }
               }
             }
           } else {

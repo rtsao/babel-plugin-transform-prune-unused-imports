@@ -1,4 +1,8 @@
 {
-  let unused = other;
-  unused;
+  let unreachable = other;
+  unreachable;
+}
+
+if (false) {
+  unreachable;
 }

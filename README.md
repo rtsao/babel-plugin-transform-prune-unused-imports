@@ -22,6 +22,7 @@ By default, only `true` and `false` identifiers are considered truthy/falsy.
 
 - `falsyExpressions` : `Array<string>` - Expressions (in addition to `false`) to be treated as falsy
 - `truthyExpressions` : `Array<string>` - Expressions (in addition to `true`) to be treated as truthy
+- `ignoredModules` : `Array<string>` - Packages/modules to ignore (i.e. will never be pruned by this plugin)
 
 ### Examples
 
