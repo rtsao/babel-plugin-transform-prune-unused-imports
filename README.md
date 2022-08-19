@@ -121,3 +121,18 @@ if (false) {
   foo;
 }
 ```
+
+#### Early returns
+
+Currently this plugin will not prune unreachable imports resulting from early returns. For example:
+
+```js
+import { unreachable } from "some-pkg";
+
+(() => {
+  if (true) {
+    return;
+  }
+  unreachable;
+})();
+```
